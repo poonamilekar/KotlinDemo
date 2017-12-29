@@ -1,8 +1,10 @@
 package com.neosoft.kotlinapp.fragments
 
+
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.AppCompatButton
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +25,8 @@ class FirstFragment : Fragment() {
     private var mParam1: String? = null
     private var mParam2: String? = null
     var a: String? = "abc"
-
+    lateinit var btnNext : AppCompatButton
+    val TAG:String="FirstFragment"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
@@ -39,7 +42,12 @@ class FirstFragment : Fragment() {
         // Inflate the layout for this fragment
         var view : View= inflater!!.inflate(R.layout.fragment_first, container, false)
         (activity as MainActivity).askPermission()
-
+        btnNext=view.findViewById(R.id.btnNext) as AppCompatButton
+        btnNext.setOnClickListener(object:View.OnClickListener{
+            override fun onClick(p0: View?) {
+                Log.e(TAG,"button Click")
+            }
+        })
         return view
     }
 
@@ -47,12 +55,10 @@ class FirstFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-
     }
 
     override fun onDetach() {
         super.onDetach()
-
     }
 
     companion object {

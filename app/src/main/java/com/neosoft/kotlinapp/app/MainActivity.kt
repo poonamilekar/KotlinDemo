@@ -19,9 +19,11 @@ import com.neosoft.kotlinapp.adapters.MyAdapter
 import com.neosoft.kotlinapp.data.AnnotationData
 import com.neosoft.kotlinapp.data.AnnotationResponse
 import com.neosoft.kotlinapp.data.MyData
+import com.neosoft.kotlinapp.db.SqliteDataManager
 import com.neosoft.kotlinapp.fragments.FirstFragment
 import com.neosoft.kotlinapp.models.Employee
 import com.neosoft.kotlinapp.retro.APIRetro
+import com.neosoft.kotlinapp.utils.Constants
 import com.neosoft.kotlinapp.utils.DownloadImage
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.Interceptor
@@ -34,7 +36,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),Constants {
 
     //lateinit var mRecyclerView : RecyclerView
 
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     var mArrayList:ArrayList<AnnotationData> = ArrayList()
     private val REQUEST_PERMISSION=1
+    lateinit var sqliteDataManager:SqliteDataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         loadFragment()
 
         checkKotlinBasics()
+        //Initialize sqlite
+        sqliteDataManager= SqliteDataManager(this,DATABASE_NAME,null,SQLITE_VERSION)
 
         //Retrofit
         getApiService().getAnnotationFilteredData(4,"").enqueue(object : Callback<AnnotationResponse>{
@@ -78,10 +83,20 @@ class MainActivity : AppCompatActivity() {
                 Log.e(TAG,"status : "+response?.body()?.status)
                 if(response?.body()?.status == 0) {
                     mArrayList.addAll(response!!.body()!!.annotationDataArrayList!!)
-                    for(item in mArrayList){
-                        Log.e(TAG,"item : "+item)
+                    var list=ArrayList<AnnotationData>()
+                    for(index in 1 downTo 100 ){
+                        list.addAll(mArrayList)
                     }
+                    sqliteDataManager.deleteAllRecords()
+                    sqliteDataManager.insertAnnotionData(list)
+
+                    /*for(item in mArrayList){
+                        Log.e(TAG,"item : "+item)
+                    }*/
                     setListAdpater(mArrayList)
+
+                    sqliteDataManager.deleteAllRecords()
+                    sqliteDataManager.bulkInsertAnnotionData(list)
                 }
             }
         })
@@ -321,16 +336,12 @@ ${'$'}9.99
         override var bar=1
         constructor(field:Int) :super(field)
 
-
-
         override fun v() {
             super<B>.v()
             super<Outer>.v()
             System.out.println("$accessInDerived")
         }
     }
-
-
 
     interface B {
         fun v() { System.out.println("v") } // interface members are 'open' by default
