@@ -84,13 +84,15 @@ class MainActivity : AppCompatActivity(),Constants {
                 if(response?.body()?.status == 0) {
                     mArrayList.addAll(response!!.body()!!.annotationDataArrayList!!)
                     var list=ArrayList<AnnotationData>()
-                    for(index in 1 downTo 100 ){
+                    var i=0;
+                    while(i < 10 ){
                         list.addAll(mArrayList)
+                        i++
                     }
                     sqliteDataManager.deleteAllRecords()
                     sqliteDataManager.insertAnnotionData(list)
 
-                    /*for(item in mArrayList){
+                   /* for(item in mArrayList){
                         Log.e(TAG,"item : "+item)
                     }*/
                     setListAdpater(mArrayList)

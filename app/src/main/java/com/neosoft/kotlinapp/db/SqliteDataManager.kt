@@ -33,7 +33,7 @@ class SqliteDataManager(context: Context,name:String,cursorFactory:SQLiteDatabas
     val UPDATED_BY="updated_by"
     val CREATED_USER_ID="created_user_id"
     val CREATED_AT="created_at"
-    val CREATE_TABLE_ANNOTATION :String="CREATE TABLE "+TABLE_ANNOTATION+"("+ID+" integer PRIMARY KEY , "
+    val CREATE_TABLE_ANNOTATION :String="CREATE TABLE "+TABLE_ANNOTATION+"("+ID+" integer , "
             .plus(USER_ID+" integer , ")
             .plus(ALERT_DESCRIPTION+" text ,")
             .plus(ALERT_TILTE+" text , ")
@@ -79,6 +79,7 @@ class SqliteDataManager(context: Context,name:String,cursorFactory:SQLiteDatabas
             contentValue.put(CREATED_USER_ID,item.createdUserId)
             contentValue.put(CREATED_AT,item.createdAt)
             db!!.insert(TABLE_ANNOTATION,null,contentValue)
+
         }
         db.close()
         Log.e(TAG,"insert Annotation done"+Date())
@@ -126,7 +127,9 @@ class SqliteDataManager(context: Context,name:String,cursorFactory:SQLiteDatabas
         var cursor:Cursor=db.rawQuery("SELECT * FROM ".plus(TABLE_ANNOTATION),null)
         if(cursor != null){
             cursor.moveToFirst()
+            Log.e(TAG,"cursoe count:"+cursor.count)
             while (!cursor.isAfterLast){
+                //Log.e(TAG,"in while ")
                 var annotationData=AnnotationData()
 
                 annotationData.id=cursor.getInt(cursor.getColumnIndex(ID))
@@ -149,6 +152,7 @@ class SqliteDataManager(context: Context,name:String,cursorFactory:SQLiteDatabas
             cursor.close()
         }
         db.close()
+        Log.e(TAG,"*** List size :"+list.size)
         return list
         //var cursor:Cursor=db.query(TABLE_ANNOTATION, String[] columns,null, null,null,null, null)
     }
