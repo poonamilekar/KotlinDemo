@@ -13,5 +13,4 @@ class Employee constructor(name : String){
     init {
         System.out.println("First property name : $name")
     }
-
 }

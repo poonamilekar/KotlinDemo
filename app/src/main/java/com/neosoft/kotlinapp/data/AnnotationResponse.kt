@@ -1,6 +1,7 @@
 package com.neosoft.kotlinapp.data
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 /**
  * Created by Poonam Ilekar on 27/12/17.
@@ -20,7 +21,7 @@ data class AnnotationData(var id :Int,@SerializedName("user_id") var userId:Int,
                           @SerializedName("created_user_level") var createdUserLevel:Int?,
                           @SerializedName("updated_by") var updatedBy:Int?,
                           @SerializedName("created_user_id") var createdUserId:Int?,
-                          @SerializedName("created_at") var createdAt : String?){
+                          @SerializedName("created_at") var createdAt : String?):Serializable{
     constructor() : this(0,0,null,null,null,null,
             null,null,null,null,null,null,0,0,null)
 }

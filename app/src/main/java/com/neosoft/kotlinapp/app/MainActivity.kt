@@ -2,13 +2,13 @@ package com.neosoft.kotlinapp.app
 
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.content.ContextCompat
-
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -22,18 +22,14 @@ import com.neosoft.kotlinapp.data.MyData
 import com.neosoft.kotlinapp.db.SqliteDataManager
 import com.neosoft.kotlinapp.fragments.FirstFragment
 import com.neosoft.kotlinapp.models.Employee
-import com.neosoft.kotlinapp.retro.APIRetro
+import com.neosoft.kotlinapp.models.MySingaltonSharedPreferannce
 import com.neosoft.kotlinapp.utils.Constants
 import com.neosoft.kotlinapp.utils.DownloadImage
 import kotlinx.android.synthetic.main.activity_main.*
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity(),Constants {
@@ -46,6 +42,7 @@ class MainActivity : AppCompatActivity(),Constants {
     lateinit var fragmentManager: FragmentManager
     lateinit var fragmentTransaction: FragmentTransaction
     public val TAG="MainActivity"
+
     lateinit var retrofit : Retrofit
     val BASE_URL="http://go.saesa.cl:81/public/index.php/"
     val API_KEY="basic_token"
@@ -55,6 +52,7 @@ class MainActivity : AppCompatActivity(),Constants {
     var mArrayList:ArrayList<AnnotationData> = ArrayList()
     private val REQUEST_PERMISSION=1
     lateinit var sqliteDataManager:SqliteDataManager
+    lateinit var data:AnnotationData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +65,16 @@ class MainActivity : AppCompatActivity(),Constants {
         recyclerView.adapter = adapter*/
 //        askPermission()
 
+        btnNext.setOnClickListener(object:View.OnClickListener{
+            override fun onClick(v: View?) {
+               /* var  b=Bundle()
+                b.putSerializable("data",data )*/
+                var intent=Intent(this@MainActivity,NextActivity::class.java)
+                intent.putExtra("data",data )
+                intent.putExtra("allData",mArrayList )
+                startActivity(intent)
+            }
+        })
         loadFragment()
 
         checkKotlinBasics()
@@ -74,7 +82,7 @@ class MainActivity : AppCompatActivity(),Constants {
         sqliteDataManager= SqliteDataManager(this,DATABASE_NAME,null,SQLITE_VERSION)
 
         //Retrofit
-        getApiService().getAnnotationFilteredData(4,"").enqueue(object : Callback<AnnotationResponse>{
+        MyApp.appInstance.getApiService().getAnnotationFilteredData(4,"").enqueue(object : Callback<AnnotationResponse>{
             override fun onFailure(call: Call<AnnotationResponse>?, t: Throwable?) {
                Log.e(TAG,""+ (t?.message ?: "Error"))
             }
@@ -111,7 +119,7 @@ class MainActivity : AppCompatActivity(),Constants {
             DownloadImage().execute()
         }
     }
-    private fun getApiService(): APIRetro {
+    /*private fun getApiService(): APIRetro {
         retrofit=Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(getClient())
@@ -135,7 +143,7 @@ class MainActivity : AppCompatActivity(),Constants {
         })
         return  okHttpClient.build()
     }
-
+*/
     fun hasPrefix(x: Any) = when(x) {
         is String -> {
             Log.e(TAG, "x is string")
@@ -167,6 +175,9 @@ class MainActivity : AppCompatActivity(),Constants {
     }
 
     private fun setListAdpater(list:ArrayList<AnnotationData>){
+
+        if(!list.isEmpty())
+            data=list.get(0)
 
         adapter = MyAdapter(this, list)
         recyclerView.adapter = adapter
@@ -308,21 +319,33 @@ ${'$'}9.99
         Log.e(TAG,"**** : "+e.firstProperty)
 
         ABC(1).v()
+        ABC(6).foo(6)
+
+        MySingaltonSharedPreferannce.setId(2)
+        Log.e(TAG,"Pref ID :"+MySingaltonSharedPreferannce.getId())
     }
 
-    open class Outer(value:Int ) :Any(){
+    open class Outer(i:Int){
         val accessInDerived=0
          open val bar: Int
             get() = 0
 
-         private var simple : Int
-             get() = 1
+          var simple : String = ""
+             get() = field
              set(value) {
-                this.simple = value
+                field = value
+            }
+        private var _table: Map<String, Int>? = null
+        public val table: Map<String, Int>
+            get() {
+                if (_table == null) {
+                    _table = HashMap()
+                }
+                return _table ?: throw AssertionError("Set to null by another thread")
             }
 
         open fun v(){
-            Log.e("","Message v")
+            Log.e("","Message v "+simple+" table:"+table)
         }
 
         inner class Nested {
@@ -343,7 +366,10 @@ ${'$'}9.99
             super<Outer>.v()
             System.out.println("$accessInDerived")
         }
+
+
     }
+    fun Outer.foo(i: Int) { println("extension"+i) }
 
     interface B {
         fun v() { System.out.println("v") } // interface members are 'open' by default

@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import com.neosoft.kotlinapp.data.AnnotationData
 import com.neosoft.kotlinapp.R
+import com.neosoft.kotlinapp.data.AnnotationData
 import kotlinx.android.synthetic.main.item_layout.view.*
 
 
@@ -18,8 +18,10 @@ class MyAdapter(var context: Context,var list:ArrayList<AnnotationData> ) : Recy
 
     var IMAGE_PATH : String="http://go.saesa.cl:81/public/upload"
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
+       //var itemLayoutBinding = ItemLayoutBinding.inflate(LayoutInflater.from(context),parent,false);
         var view=LayoutInflater.from(context).inflate(R.layout.item_layout,parent,false)
         return MyHolder(view)
+        //return MyHolder(itemLayoutBinding)
     }
 
     override fun getItemCount(): Int {
